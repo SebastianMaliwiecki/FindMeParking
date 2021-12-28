@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Settings, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import StackNavigator from './StackNavigator';
 import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons'; 
 
@@ -23,11 +24,10 @@ const TabNavigator = () => {
                 screenOptions = {{
                     tabBarStyle: {
                         position: 'absolute',
-                        bottom: 25,
-                        left: 10,
-                        right: 10,
-                        height: 70,
-                        borderRadius: 15,
+                        justifyContent: 'center',
+                        height: 85,
+                        borderTopLeftRadius: 15,
+                        borderTopRightRadius: 15,
                         backgroundColor: 'rgb(13,17,23)',
                         borderTopWidth: 0,
                         borderRightWidth: 0,
@@ -40,10 +40,10 @@ const TabNavigator = () => {
             >
                 <Tab.Screen 
                     name="Permit_Map" 
-                    component={Map} 
+                    component={StackNavigator} 
                     options={{
                         tabBarIcon: ({focused}) => (
-                            <View style={{alignItems:'center', justifyContent:'center', top: 15}}>
+                            <View style={{alignItems:'center', justifyContent:'center',  width: 100,}}>
                                 <Entypo 
                                     name="map" 
                                     size={20} 
@@ -59,7 +59,7 @@ const TabNavigator = () => {
                     component={Map} 
                     options={{
                         tabBarIcon: ({focused}) => (
-                            <View style={{alignItems:'center', justifyContent:'center', top: 15}}>
+                            <View style={{alignItems:'center', justifyContent:'center', width: 100,}}>
                                 <Entypo 
                                     name="list" 
                                     size={20} 
@@ -75,7 +75,7 @@ const TabNavigator = () => {
                     component={Map} 
                     options={{
                         tabBarIcon: ({focused}) => (
-                            <View style={{alignItems:'center', justifyContent:'center', top: 15}}>
+                            <View style={{alignItems:'center', justifyContent:'center', width: 100,}}>
                                 <FontAwesome name="road" size={20} color={focused ? tabColour.focused : tabColour.notNofuced} />
                                 <Text style={{color: focused ? tabColour.focused : tabColour.notNofuced, fontSize: 11}}>Travel update</Text>
                             </View>
@@ -87,7 +87,7 @@ const TabNavigator = () => {
                     component={Chatbot} 
                     options={{
                         tabBarIcon: ({focused}) => (
-                            <View style={{alignItems:'center', justifyContent:'center', top: 15}}>
+                            <View style={{alignItems:'center', justifyContent:'center', width: 100,}}>
                                 <Entypo 
                                     name="chat" 
                                     size={20} 

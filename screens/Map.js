@@ -3,7 +3,7 @@ import { StyleSheet, Text, View,TouchableOpacity } from 'react-native'
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
 
-const Map = () => {
+const Map = ({navigation}) => {
 
     const mapStyle=[
         {
@@ -169,20 +169,22 @@ const Map = () => {
 
     return (
         <View style={styles.container}>
+
             <TouchableOpacity
                 onPress={() => {
                     console.log("settings pressed")
+                    navigation.navigate("Settings")
                 }}
-                style={{zIndex: 1}}
+                style={styles.settings}
             >
-                <View style={styles.settings}>
+                <View >
                     <Ionicons name="settings" size={27} color="white" />
                 </View>
             </TouchableOpacity>
             
             <MapView
                 mapPadding={{
-                    bottom:70,
+                    bottom: 80,
                     top: 50
                 }}
                 style={{height:'100%', width:'100%'}}
