@@ -1,5 +1,5 @@
 const mapStyle=[
-    {
+  {
       "elementType": "geometry",
       "stylers": [
         {
