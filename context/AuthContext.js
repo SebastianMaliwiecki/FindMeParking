@@ -3,9 +3,10 @@ import { auth, db } from '../firebase';
 import { 
     onAuthStateChanged, 
     createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword ,
+    signInWithEmailAndPassword,
     signOut
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore"; 
 
 const authContext = React.createContext();
 
@@ -35,13 +36,13 @@ export function AuthProvider({ children }) {
         return signOut(auth); 
     };
 
-    const insertUserInfo = (email, password, firstName, lastName) => {
-        return db.collection('users').doc(email).set({
-            Firstname: firstName,
-            Lastname: lastName,
-            Email: email,
-            Password: password
-        })
+    const insertUserInfo = (name, email, carReg) => {
+        console.log(CurrentUser.uid);
+        return setDoc(doc(db, "users", email), {
+            name: name,
+            email: email,
+            car_registration: carReg,
+        });
     };
 
     const userInfo = {

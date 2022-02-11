@@ -15,7 +15,9 @@ const AuthStackNav = () => {
             }}
         >
             <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Signup" component={Signup} />
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+                <Stack.Screen name="Signup" component={Signup} />
+            </Stack.Group>
         </Stack.Navigator>
     )
 }

@@ -6,11 +6,13 @@ const Signup = ({navigation}) => {
 
     const[email, setEmail] =  useState("");
     const[password, setPassword] =  useState("");
+    const[name, setName] = useState("");
+    const[carReg, setCarReg] = useState("");
 
     const [buttonActive, setButtonActive] = useState(false);
     const [signUpError, setSignUpError] = useState("");
 
-    const { signUp } = useAuthContext();
+    const { signUp, insertUserInfo } = useAuthContext();
 
     const submisionHandler = async (e) => {
         try {
@@ -18,6 +20,11 @@ const Signup = ({navigation}) => {
             await signUp(
                 email, 
                 password,
+            );
+            await insertUserInfo(
+                name,
+                email,
+                carReg
             );
         }
         catch (error) {
@@ -36,17 +43,33 @@ const Signup = ({navigation}) => {
             </View>
             <TextInput
                 style={styles.input}
-                placeholder='Email'
-                placeholderTextColor="white" 
-                onChangeText={setEmail}
+                placeholder='Name'
+                placeholderTextColor='rgb(186, 181, 181)'
+                onChangeText={setName} 
                 keyboardAppearance='dark'
             />
             <TextInput
                 style={styles.input}
+                placeholder='Email'
+                placeholderTextColor='rgb(186, 181, 181)'
+                onChangeText={setEmail}
+                keyboardAppearance='dark'
+                keyboardType='email-address'
+            />
+            <TextInput
+                style={styles.input}
                 placeholder='Password'
-                placeholderTextColor="white"
+                placeholderTextColor='rgb(186, 181, 181)'
                 onChangeText={setPassword} 
                 keyboardAppearance='dark'
+            />
+            <TextInput
+                style={styles.input}
+                placeholder='Car Registration'
+                placeholderTextColor='rgb(186, 181, 181)'
+                onChangeText={setCarReg} 
+                keyboardAppearance='dark'
+                autoCapitalize = {"characters"}
             />
             <Button
                 title={buttonActive ? "Logging in..." : "Press to login"}
@@ -83,9 +106,14 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10,
-        borderColor: 'white',
         width: '90%',
-        color: 'white'
+        color: 'white',
+        height: 50,
+        borderRadius: 25,
+        fontSize: 17,
+        elevation: 0,
+        backgroundColor: 'rgb(13,17,23)',
+        borderWidth: 0, 
     },
     text: {
         color: 'white',

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { StyleSheet, Text, View,TouchableOpacity } from 'react-native'
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import mapStyle from '../assets/map/MapStyle';
 import {db} from '../firebase'
 import { collection, addDoc } from "firebase/firestore"; 
@@ -32,6 +33,17 @@ const Map = ({navigation}) => {
             >
                 <View >
                     <Ionicons name="settings" size={27} color="white" />
+                </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => {
+                    navigation.navigate("Settings")
+                }}
+                style={styles.car}
+            >
+                <View >
+                    <FontAwesome5 name="car-side" size={24} color="white" />
                 </View>
             </TouchableOpacity>
             
@@ -70,6 +82,12 @@ const styles = StyleSheet.create({
     settings: {
         position: 'absolute',
         top: 50,
+        right: 20,
+        zIndex: 1
+    },
+    car: {
+        position: 'absolute',
+        top: 95,
         right: 20,
         zIndex: 1
     }
