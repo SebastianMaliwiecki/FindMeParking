@@ -6,7 +6,7 @@ import {
     signInWithEmailAndPassword,
     signOut
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc } from "firebase/firestore"; 
 
 const authContext = React.createContext();
 
@@ -18,8 +18,9 @@ export function AuthProvider({ children }) {
 
     const [CurrentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [userInfo, setUserInfo] = useState([]);
 
-    useEffect(() => onAuthStateChanged(auth, (user) => {
+    useEffect(async () => onAuthStateChanged(auth, (user) => {
         setCurrentUser(user);
         setLoading(false);
     }));
@@ -37,7 +38,6 @@ export function AuthProvider({ children }) {
     };
 
     const insertUserInfo = (name, email, carReg) => {
-        console.log(CurrentUser.uid);
         return setDoc(doc(db, "users", email), {
             name: name,
             email: email,
@@ -45,16 +45,24 @@ export function AuthProvider({ children }) {
         });
     };
 
-    const userInfo = {
+    const getUserInfo = async () => {
+        const docRef = await getDoc(doc(db, "users", CurrentUser.email));
+        const docSnap = await getDoc(docRef);
+        console.log("test")
+        return docSnap.data();
+    }
+
+    const authOptions = {
         CurrentUser,
         signUp,
         Login,
         Logout,
         insertUserInfo,
+        getUserInfo,
     };
 
     return (
-        <authContext.Provider value={userInfo}>
+        <authContext.Provider value={authOptions}>
             {!loading && children}
         </authContext.Provider>
     )

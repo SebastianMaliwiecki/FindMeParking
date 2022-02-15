@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Map from './screens/Map';
 import Settings from './screens/Settings';
+import CarInfo from './screens/CarInfo';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,8 +17,13 @@ const StackNavigator = () => {
             }}
         >
             <Stack.Screen name="Map" component={Map} />
+
             <Stack.Group screenOptions={{ presentation: 'modal' }}>
                 <Stack.Screen name="Settings" component={Settings} />
+            </Stack.Group>
+
+            <Stack.Group screenOptions={{ presentation: 'modal' }}>
+                <Stack.Screen name="Car-Info" component={CarInfo} />
             </Stack.Group>
         </Stack.Navigator>
     )

@@ -10,7 +10,7 @@ const NavigationManager = () => {
     const { CurrentUser } = useAuthContext();
     
     return (
-        <>{CurrentUser ? <TabNavigator /> : <AuthStackNav/>}</>
+        <>{ CurrentUser ? <TabNavigator /> : <AuthStackNav />}</>
     )
 }
 

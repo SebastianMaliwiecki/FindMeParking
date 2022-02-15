@@ -4,7 +4,7 @@ import MapView, {PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import mapStyle from '../assets/map/MapStyle';
-import {db} from '../firebase'
+import {db} from '../firebase';
 import { collection, addDoc } from "firebase/firestore"; 
 
 
@@ -38,11 +38,11 @@ const Map = ({navigation}) => {
 
             <TouchableOpacity
                 onPress={() => {
-                    navigation.navigate("Settings")
+                    navigation.navigate("Car-Info")
                 }}
                 style={styles.car}
             >
-                <View >
+                <View>
                     <FontAwesome5 name="car-side" size={24} color="white" />
                 </View>
             </TouchableOpacity>
@@ -67,6 +67,7 @@ const Map = ({navigation}) => {
                 showsScale={true}
                 showsBuildings={true}
                 showsPointsOfInteres={true}
+                onPress={ (event) => console.log(event.nativeEvent) }
             >
             </MapView>
         </View>

@@ -11,7 +11,7 @@ const Login = ({navigation}) => {
     const [buttonActive, setButtonActive] = useState(false)
     const [isFocused, setIsFocused] = useState(true)
 
-    const { Login} = useAuthContext();
+    const { Login } = useAuthContext();
 
     const LoginAlert = () => {
         Alert.alert(
