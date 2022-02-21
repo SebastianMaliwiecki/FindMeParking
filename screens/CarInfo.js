@@ -9,7 +9,7 @@ import { useUserContext } from '../context/UserContext';
 const CarInfo = () => {
 
   const { CurrentUser} = useAuthContext();
-  const {info} = useUserContext();
+  const { info } = useUserContext();
   console.log(info);
 
   const[carInfo, setCarInfo] = useState("");

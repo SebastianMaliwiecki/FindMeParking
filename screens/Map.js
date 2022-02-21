@@ -1,27 +1,58 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { StyleSheet, Text, View,TouchableOpacity } from 'react-native'
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import mapStyle from '../assets/map/MapStyle';
-import {db} from '../firebase';
-import { collection, addDoc } from "firebase/firestore"; 
+import * as Location from 'expo-location'; 
 
+const latitudeDelta = 0.0922
+const longitudeDelta = 0.0421
 
 const Map = ({navigation}) => {
+    
+    // Set intial region location
+    const [region, setRegion] = useState({
+        latitude: 51.50850191003386,
+        longitude: -0.12300140741851891,
+        latitudeDelta,
+        longitudeDelta
+    });
+    // Region location
+    const [location, setLocation] = useState([]);
+    const [errorMsg, setErrorMsg] = useState("");
+    // Current location of the user whilst travelling
+    const [currentUserLocation, setCurrentUserLocation] = useState([]);
+    const mapRef = useRef()
 
-    // useEffect(async () => {
-    //     try {
-    //         const docRef = await addDoc(collection(db, "users"), {
-    //             first: "Ada",
-    //             last: "Lovelace",
-    //             born: 1815
-    //         });
-    //         console.log("Document written with ID: ", docRef.id);
-    //     } catch (e) {
-    //         console.error("Error adding document: ", e);
-    //     }
-    // })
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation({
+                lat: location.coords.latitude,
+                long : location.coords.longitude,
+            });
+            setRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta,
+                longitudeDelta
+            })
+        })();
+    }, []);
+
+    useEffect(() => {
+        animateToRegion();
+    }, [region])
+
+    const animateToRegion = () => {
+        mapRef.current.animateToRegion(region, 1000);
+    }
 
     return (
         <View style={styles.container}>
@@ -48,18 +79,14 @@ const Map = ({navigation}) => {
             </TouchableOpacity>
             
             <MapView
+                ref={mapRef}
                 mapPadding={{
                     bottom: 80,
                     top: 50
                 }}
                 style={{height:'100%', width:'100%'}}
                 provider={PROVIDER_GOOGLE}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
+                initialRegion={region}
                 customMapStyle={mapStyle}
                 showsUserLocation={true}
                 showsMyLocationButton={true}
@@ -67,9 +94,24 @@ const Map = ({navigation}) => {
                 showsScale={true}
                 showsBuildings={true}
                 showsPointsOfInteres={true}
+                minZoomLevel={15}
+                maxZoomLevel={16}
                 onPress={ (event) => console.log(event.nativeEvent) }
+                onUserLocationChange={ region => setCurrentUserLocation(region.nativeEvent.coordinate)}
             >
             </MapView>
+
+            {/* <Snackbar
+                visible={visible}
+                onDismiss={onDismissSnackBar}
+                action={{
+                label: 'OK',
+                onPress: () => {
+                    // Do something
+                },
+                }}>
+                Region location has been updated!
+            </Snackbar> */}
         </View>
     )
 }
