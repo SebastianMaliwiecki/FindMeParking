@@ -4,13 +4,17 @@ import Login from './screens/Login';
 import { AuthProvider } from './context/AuthContext';
 import { UserProvider } from './context/UserContext';
 import NavigationManager from './NavigationManager';
+import { PermitProvider } from './context/PermitContext';
+
 
 export default function App() {
   return (
     <NavigationContainer>
       <AuthProvider>
         <UserProvider>
-          <NavigationManager/>
+          <PermitProvider>
+            <NavigationManager/>
+          </PermitProvider>
         </UserProvider>
       </AuthProvider>
     </NavigationContainer>
