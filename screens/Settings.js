@@ -2,12 +2,9 @@ import React from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native'
 import { useAuthContext } from '../context/AuthContext';
 
-const Settings = ({navigation, route}) => {
+const Settings = ({navigation}) => {
 
     const { Logout } = useAuthContext();
-    const {perm} = route.params
-
-    console.log(perm)
 
     const logoutHandler = async () => {
         try {

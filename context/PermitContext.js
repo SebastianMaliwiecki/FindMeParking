@@ -14,7 +14,7 @@ export const PermitProvider = ({children}) => {
 
     useEffect( async () => {
         try {
-            const permits = collection(db, 'LBBD');
+            const permits = collection(db, 'Permit_zones');
             await getDocs(permits).then((snapshoot)=> {
                 snapshoot.docs.forEach(doc => {
                     let geoPoints = [];
@@ -24,7 +24,7 @@ export const PermitProvider = ({children}) => {
                             longitude: coor.longitude,
                         })
                     })
-                    permsD.push({boundary: geoPoints})
+                    permsD.push({boundary: geoPoints, start: doc.data().start_time, end: doc.data().end_time})
                 })
             })
         } catch {
