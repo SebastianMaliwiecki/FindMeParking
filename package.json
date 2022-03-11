@@ -24,7 +24,10 @@
     "react-native-maps": "0.29.4",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.10.1",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22",
+    "react-native-gesture-handler": "~2.1.0",
+    "react-native-reanimated": "~2.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

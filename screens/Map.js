@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { StyleSheet, Text, View,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import MapView, {Polygon, PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -9,6 +9,10 @@ import * as geolib from 'geolib';
 import { doc, getDoc, collection, getDocs, setDoc, GeoPoint} from "firebase/firestore";
 import {db} from '../firebase';
 import { usePermitContext } from '../context/PermitContext';
+import Animated from 'react-native-reanimated';
+import BottomSheet from 'reanimated-bottom-sheet';
+import { Octicons } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 
 const latitudeDelta = 0.0922
 const longitudeDelta = 0.0421
@@ -34,6 +38,43 @@ const Map = ({navigation}) => {
     const mapRef = useRef()
     const polyRef = useRef()
     const [permitMessage, setPermitMessage] = useState("");
+
+    const sheetRef = useRef();
+    const fall = new Animated.Value(1);
+    
+    const fetchPermitData = () => {
+        try {
+            if(inPermitZone) {
+                if(geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
+                    setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
+                }
+            }
+
+            if(!inPermitZone) {
+                
+                permitData.map((item) => {
+                    let boundaries = geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, item.boundary)
+                    
+                    if(boundaries) {
+                        setPermitMessage(`You can park here till ${item.end}`)
+                        setCurreontPermitZone(item)
+                        setInPertmitZone(true)
+                    }
+                    else {
+                        setPermitMessage("Not in any zone")
+                    }
+                })
+            }
+        }
+        catch(e) {
+            setPermitMessage("Fetching data!")
+        }
+    }
+
+    useEffect(() => {
+        fetchPermitData()
+        console.log("test")
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -100,32 +141,7 @@ const Map = ({navigation}) => {
     }
 
     useEffect(() => {
-        try {
-            if(inPermitZone) {
-                if(geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
-                    setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
-                }
-            }
-
-            if(!inPermitZone) {
-                
-                permitData.map((item) => {
-                    let boundaries = geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, item.boundary)
-                    
-                    if(boundaries) {
-                        setPermitMessage(`You can park here till ${item.end}`)
-                        setCurreontPermitZone(item)
-                        setInPertmitZone(true)
-                    }
-                    else {
-                        setPermitMessage("Not in any zone")
-                    }
-                })
-            }
-        }
-        catch(e) {
-            setPermitMessage("Fetching data!")
-        }
+        fetchPermitData()
     }, [currentUserLocation])
 
     function timeToDecimal(t) {
@@ -141,25 +157,101 @@ const Map = ({navigation}) => {
         //console.log(timeToDecimal("17:26"))
         if (now >= start && now < end) {
             return "rgba(238, 22, 22, 0.12)" // red - cannot paork
-        } else {
-            return "rgba(39, 245, 50, 0.14)" // green - can park
-        }
+        } 
+        return "rgba(39, 245, 50, 0.14)" // green - can park
     }
+    
+    const checkIfPermitZonesApplies = (start, end) => {
+        const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
+        const now = timeToDecimal(currentTimeStringFormat)
+        if (now >= start && now < end) {
+            return true
+        } 
+        return false
+    }
+
+    const checkTimeOfDay = () => new Date().getHours < 12 ? true : false
+
+    const renderContent = () => (
+        <View
+            style={{
+                backgroundColor: 'rgb(7,10,14)',
+                padding: 16,
+                height: 450,
+            }}
+        >
+            <View style={{flexDirection:'row'}}>
+                {
+                    checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ?
+                        (
+                            <View style={{backgroundColor: 'red', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                                <Octicons name="stop" size={33} color="white" />
+                            </View>
+                        ) 
+                            :
+                        (
+                            <View style={{backgroundColor: 'green', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                                <Entypo name="check" size={33} color="white" />
+                            </View>
+                        )
+                }
+                
+                <Text style={{color: 'white', fontSize: 23, marginLeft: 20, fontWeight: 'bold'}}>
+                    {checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ? "No Parking" : "Free Parking"}
+                    {"\n"}
+                    <Text style={{fontSize: 15, color: '#B6B6B6', fontWeight: 'normal'}}>
+                        Residential bays
+                    </Text>
+                </Text>
+                
+            </View>
+            <View style={{alignItems: 'center', marginTop: 5}}> 
+                <View style={{backgroundColor: '#90EE90', alignItems: 'center', borderRadius: 5}}>
+                    <Text style={{color: 'black', fontSize: 17, fontWeight: 'bold', padding: 7}}>
+                        {checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ? `Free to park after ${decimalToHourMinsConverter(currentPermitZone.end)}` : `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} Monday`}
+                    </Text>
+                </View>
+            </View>
+            <View
+                style={{
+                    backgroundColor: 'rgb(13,17,23)',
+                    marginTop: 10,
+                    marginBottom: 10,
+                    height: 7,
+                    borderRadius: 5,
+                }}
+            />
+            <View>
+                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                    Operating times
+                </Text>
+            </View>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
 
-            <TouchableOpacity
+            <BottomSheet
+                ref={sheetRef}
+                snapPoints={[500, 200]}
+                borderRadius={10}
+                initialSnap={1}
+                callbackNode={fall}
+                enabledContentGestureInteraction={true}
+                renderContent={renderContent}
+            />
+
+            {/* <TouchableOpacity
                 style={styles.permitInfo}
+                onPress={() => sheetRef.current.snapTo(0)}
             >
-                <View style={{
-                    
-                }}>
+                <View style={{}}>
                     <Text style={{color:"white",}}>
                         {permitMessage}
                     </Text>
                 </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
                 onPress={async () => {
@@ -186,7 +278,7 @@ const Map = ({navigation}) => {
             <MapView
                 ref={mapRef}
                 mapPadding={{
-                    bottom: 50,
+                    bottom: 170,
                     top: 50
                 }}
                 style={{height:'100%', width:'100%'}}
