@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
 import MapView, {Polygon, PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -14,12 +14,14 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import { Octicons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 
-const latitudeDelta = 0.0922
-const longitudeDelta = 0.0421
-
 const Map = ({navigation}) => {
 
-    const {permitData} = usePermitContext();
+    const latitudeDelta = 0.0922;
+    const longitudeDelta = 0.0421;
+
+    const currentDay = new Date().getDay();
+
+    const { permitData } = usePermitContext();
     
     // Set intial region location
     const [region, setRegion] = useState({
@@ -48,10 +50,11 @@ const Map = ({navigation}) => {
                 if(geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
                     setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
                 }
+                else {
+                    setInPertmitZone(false)
+                }
             }
-
-            if(!inPermitZone) {
-                
+            else {
                 permitData.map((item) => {
                     let boundaries = geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, item.boundary)
                     
@@ -73,7 +76,7 @@ const Map = ({navigation}) => {
 
     useEffect(() => {
         fetchPermitData()
-        console.log("test")
+        console.log(new Date().getDay(), "dfgedr")
     }, [])
 
     useEffect(() => {
@@ -108,6 +111,16 @@ const Map = ({navigation}) => {
     }
     
     const permitBoundary =  {
+    }
+
+    const permitTimes = {
+        1:[8.5, 17.5],
+        2:[8.5, 17.5],
+        3:[8.5, 17.5],
+        4:[8.5, 17.5],
+        5:[8.5, 17.5],
+        6:[0],
+        7:[0],
     }
 
     // useEffect(async () => {
@@ -158,6 +171,9 @@ const Map = ({navigation}) => {
         if (now >= start && now < end) {
             return "rgba(238, 22, 22, 0.12)" // red - cannot paork
         } 
+        else if (start == 0 && end ==0 ) {
+            return "rgba(39, 245, 50, 0.14)" // green - can park
+        }
         return "rgba(39, 245, 50, 0.14)" // green - can park
     }
     
@@ -171,6 +187,27 @@ const Map = ({navigation}) => {
     }
 
     const checkTimeOfDay = () => new Date().getHours < 12 ? true : false
+
+    const permitTimesD = () => {
+        try {
+            return (
+                currentPermitZone.permit_times.map(item => (
+                    <View style={{marginRight: 60, borderColor: 'white',}}>
+                        <Text style={{color:'white',  padding: 5}}>
+                        {item[0]}
+                        </Text>
+                    </View>
+                ))
+            )
+        }
+        catch {
+            return (
+                <Text style={{color:'white',   padding: 5}}>
+                    Fetching data
+                </Text>
+            )
+        }
+    }
 
     const renderContent = () => (
         <View
@@ -205,13 +242,14 @@ const Map = ({navigation}) => {
                 </Text>
                 
             </View>
-            <View style={{alignItems: 'center', marginTop: 5}}> 
+            <View style={{alignItems: 'center', marginTop: 5, marginBottom: 5}}> 
                 <View style={{backgroundColor: '#90EE90', alignItems: 'center', borderRadius: 5}}>
                     <Text style={{color: 'black', fontSize: 17, fontWeight: 'bold', padding: 7}}>
                         {checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ? `Free to park after ${decimalToHourMinsConverter(currentPermitZone.end)}` : `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} Monday`}
                     </Text>
                 </View>
             </View>
+            <ScrollView>
             <View
                 style={{
                     backgroundColor: 'rgb(13,17,23)',
@@ -225,21 +263,93 @@ const Map = ({navigation}) => {
                 <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
                     Operating times
                 </Text>
+                <ScrollView horizontal={true}>
+                    {
+                        permitTimesD()
+                    }
+                </ScrollView>
+                
             </View>
+            <View
+                style={{
+                    backgroundColor: 'rgb(13,17,23)',
+                    marginTop: 10,
+                    marginBottom: 10,
+                    height: 7,
+                    borderRadius: 5,
+                }}
+            />
+            <View>
+                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                    Buy Permit
+                </Text>
+                <Text>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem distinctio perspiciatis ad nostrum perferendis rerum cumque eum esse nesciunt tempora sapiente, mollitia inventore, voluptatum quod modi ipsa earum ab quaerat?
+                </Text>
+            </View>
+            <View
+                style={{
+                    backgroundColor: 'rgb(13,17,23)',
+                    marginTop: 10,
+                    marginBottom: 10,
+                    height: 7,
+                    borderRadius: 5,
+                }}
+            />
+            <View>
+                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                    Data problems?
+                </Text>
+                <Text style={{color: 'white', marginTop: 20}}>
+                    Have you seen a discrepancy in our data? Please let us know so that we can investigate.
+                </Text>
+                <View style={{
+                    shadowColor: "white",
+                    shadowOffset: {
+                        width: 0,
+                        height: 1,
+                    },
+                    shadowOpacity: 0.22,
+                    shadowRadius: 2.22,
+                    
+                    elevation: 3,
+                }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        
+                    }}
+                    style={styles.button}
+                >
+                    <Text style={{color: 'white'}}>Let us know</Text>
+                </TouchableOpacity>
+                </View>
+            </View>
+            </ScrollView>
+            
         </View>
     );
+
+    const headerRender = () => (
+        <View>
+            <Text>
+                23423
+            </Text>
+        </View>
+    )
 
     return (
         <View style={styles.container}>
 
             <BottomSheet
                 ref={sheetRef}
-                snapPoints={[500, 200]}
+                snapPoints={[523, 200]}
                 borderRadius={10}
                 initialSnap={1}
                 callbackNode={fall}
                 enabledContentGestureInteraction={true}
+                //renderHeader={headerRender}
                 renderContent={renderContent}
+                enabledInnerScrolling={true}
             />
 
             {/* <TouchableOpacity
@@ -302,7 +412,7 @@ const Map = ({navigation}) => {
                             <Polygon
                                 //"rgba(238, 22, 22, 0.12)"
                                 // 0.40 for darker red
-                                fillColor={permitZoneColour(item.start, item.end)}
+                                fillColor={permitZoneColour(item.permit_times[currentDay][0], item.permit_times[currentDay][1])}
                                 coordinates={item.boundary}
                                 tappable={true}
                                 onPress = {() => console.log("test")}
@@ -360,5 +470,43 @@ const styles = StyleSheet.create({
         flex: 1,
         marginLeft: 7,
         borderRadius: 15,
-    }
+    },
+    button: {
+        marginTop: 10,
+        alignItems: "center",
+        backgroundColor: 'rgb(13,17,23)',
+        padding: 10,
+        overflow: 'hidden',
+        borderRadius: 5,
+        width: 'auto',
+        shadowColor: "white",
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.32,
+        shadowRadius: 5.46,
+        elevation: 9,
+        marginBottom: 20
+    },
+    header: {
+        backgroundColor: 'rgb(7,10,14)',
+        shadowColor: '#333333',
+        shadowOffset: {width: -1, height: -3},
+        shadowRadius: 2,
+        shadowOpacity: 0.4,
+        paddingTop: 7,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    panelHeader: {
+        alignItems: 'center',
+    },
+    panelHandle: {
+        width: 40,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: 'white',
+        marginBottom: 10,
+    },
 })
