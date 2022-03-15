@@ -20,6 +20,7 @@ const Map = ({navigation}) => {
     const longitudeDelta = 0.0421;
 
     const currentDay = new Date().getDay();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
     const { permitData } = usePermitContext();
     
@@ -139,7 +140,7 @@ const Map = ({navigation}) => {
     // }, [])
 
     const [inPermitZone, setInPertmitZone] = useState(false)
-    const [currentPermitZone, setCurreontPermitZone] = useState([])
+    const [currentPermitZone, setCurreontPermitZone] = useState({})
 
     /*
         - a way to check what the time is and set a message based on the time, if the user is in zone during permit time display proper message and
@@ -164,11 +165,13 @@ const Map = ({navigation}) => {
         return parseFloat(parseInt(arr[0], 10) + '.' + (dec<10?'0':'') + dec);
     }  
 
+    const currentDecimalTime = timeToDecimal(`${new Date().getHours()}:${new Date().getMinutes()}`)
+
     const permitZoneColour = (start, end) => {
         const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
         const now = timeToDecimal(currentTimeStringFormat)
         //console.log(timeToDecimal("17:26"))
-        if (now >= start && now < end) {
+        if (currentDecimalTime >= start && currentDecimalTime < end) {
             return "rgba(238, 22, 22, 0.12)" // red - cannot paork
         } 
         else if (start == 0 && end ==0 ) {
@@ -186,15 +189,36 @@ const Map = ({navigation}) => {
         return false
     }
 
+    const displayPermitMessage = (start, end) => {
+        const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
+        const now = timeToDecimal(currentTimeStringFormat)
+        try {
+            if(start==0 && end==0) {
+                `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} Monday`
+            }
+    
+            if (now >= start && now < end) {
+                return `Free to park after ${decimalToHourMinsConverter(currentPermitZone.end)}`
+            } 
+            else {
+               return `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} ${currentPermitZone.permit_times[currentDay+1][0]==0?"Monday": days[currentDay]}` 
+            }
+        }
+        catch {
+            return "Fetching data..."
+        }
+    }
+
     const checkTimeOfDay = () => new Date().getHours < 12 ? true : false
 
     const permitTimesD = () => {
         try {
             return (
-                currentPermitZone.permit_times.map(item => (
-                    <View style={{marginRight: 60, borderColor: 'white',}}>
-                        <Text style={{color:'white',  padding: 5}}>
-                        {item[0]}
+                currentPermitZone.permit_times.map((item, index) => (
+                    <View style={{ marginRight: 60, borderColor: currentDay==index ? 'rgb(56,166,255)' : 'white', borderWidth: currentDay==index ? 2 : 1, marginTop: 5, marginBottom: 5, borderRadius: 5, }}>
+                        <Text style={{color:'white',  padding: 10, textAlign: 'center', fontWeight: currentDay==index ? '800' : 'normal'}}>
+                            {days[index]} {"\n"} 
+                            {item[0]==0 ? "Free parking" : `${decimalToHourMinsConverter(item[0])} to ${decimalToHourMinsConverter(item[1])}`}
                         </Text>
                     </View>
                 ))
@@ -202,8 +226,8 @@ const Map = ({navigation}) => {
         }
         catch {
             return (
-                <Text style={{color:'white',   padding: 5}}>
-                    Fetching data
+                <Text style={{color:'white', padding: 10, fontWeight: '800'}}>
+                    Fetching data...
                 </Text>
             )
         }
@@ -245,85 +269,90 @@ const Map = ({navigation}) => {
             <View style={{alignItems: 'center', marginTop: 5, marginBottom: 5}}> 
                 <View style={{backgroundColor: '#90EE90', alignItems: 'center', borderRadius: 5}}>
                     <Text style={{color: 'black', fontSize: 17, fontWeight: 'bold', padding: 7}}>
-                        {checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ? `Free to park after ${decimalToHourMinsConverter(currentPermitZone.end)}` : `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} Monday`}
+                        {currentPermitZone!={}? displayPermitMessage(currentPermitZone.start, currentPermitZone.end) : "Free parking all time"}
                     </Text>
                 </View>
             </View>
-            <ScrollView>
-            <View
-                style={{
-                    backgroundColor: 'rgb(13,17,23)',
-                    marginTop: 10,
-                    marginBottom: 10,
-                    height: 7,
-                    borderRadius: 5,
-                }}
-            />
-            <View>
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
-                    Operating times
-                </Text>
-                <ScrollView horizontal={true}>
-                    {
-                        permitTimesD()
-                    }
-                </ScrollView>
-                
-            </View>
-            <View
-                style={{
-                    backgroundColor: 'rgb(13,17,23)',
-                    marginTop: 10,
-                    marginBottom: 10,
-                    height: 7,
-                    borderRadius: 5,
-                }}
-            />
-            <View>
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
-                    Buy Permit
-                </Text>
-                <Text>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem distinctio perspiciatis ad nostrum perferendis rerum cumque eum esse nesciunt tempora sapiente, mollitia inventore, voluptatum quod modi ipsa earum ab quaerat?
-                </Text>
-            </View>
-            <View
-                style={{
-                    backgroundColor: 'rgb(13,17,23)',
-                    marginTop: 10,
-                    marginBottom: 10,
-                    height: 7,
-                    borderRadius: 5,
-                }}
-            />
-            <View>
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
-                    Data problems?
-                </Text>
-                <Text style={{color: 'white', marginTop: 20}}>
-                    Have you seen a discrepancy in our data? Please let us know so that we can investigate.
-                </Text>
-                <View style={{
-                    shadowColor: "white",
-                    shadowOffset: {
-                        width: 0,
-                        height: 1,
-                    },
-                    shadowOpacity: 0.22,
-                    shadowRadius: 2.22,
-                    
-                    elevation: 3,
-                }}>
-                <TouchableOpacity
-                    onPress={() => {
-                        
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+            >
+                <View
+                    style={{
+                        backgroundColor: 'rgb(13,17,23)',
+                        marginTop: 10,
+                        marginBottom: 10,
+                        height: 7,
+                        borderRadius: 5,
                     }}
-                    style={styles.button}
-                >
-                    <Text style={{color: 'white'}}>Let us know</Text>
-                </TouchableOpacity>
+                />
+                <View>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                        Operating times
+                    </Text>
+                    <ScrollView 
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                    >
+                        {
+                            permitTimesD()
+                        }
+                    </ScrollView>
+                    
                 </View>
-            </View>
+                <View
+                    style={{
+                        backgroundColor: 'rgb(13,17,23)',
+                        marginTop: 10,
+                        marginBottom: 10,
+                        height: 7,
+                        borderRadius: 5,
+                    }}
+                />
+                <View>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                        Buy Permit
+                    </Text>
+                    <Text>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem distinctio perspiciatis ad nostrum perferendis rerum cumque eum esse nesciunt tempora sapiente, mollitia inventore, voluptatum quod modi ipsa earum ab quaerat?
+                    </Text>
+                </View>
+                <View
+                    style={{
+                        backgroundColor: 'rgb(13,17,23)',
+                        marginTop: 10,
+                        marginBottom: 10,
+                        height: 7,
+                        borderRadius: 5,
+                    }}
+                />
+                <View>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                        Data problems?
+                    </Text>
+                    <Text style={{color: 'white', marginTop: 20}}>
+                        Have you seen a discrepancy in our data? Please let us know so that we can investigate.
+                    </Text>
+                    <View style={{
+                        shadowColor: "white",
+                        shadowOffset: {
+                            width: 0,
+                            height: 1,
+                        },
+                        shadowOpacity: 0.22,
+                        shadowRadius: 2.22,
+                        
+                        elevation: 3,
+                    }}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            
+                        }}
+                        style={styles.button}
+                    >
+                        <Text style={{color: 'white'}}>Let us know</Text>
+                    </TouchableOpacity>
+                    </View>
+                </View>
             </ScrollView>
             
         </View>
