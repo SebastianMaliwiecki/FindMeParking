@@ -17,7 +17,6 @@ export const PermitProvider = ({children}) => {
             const permits = collection(db, 'Permit_zones');
             await getDocs(permits).then((snapshoot)=> {
                 snapshoot.docs.forEach(doc => {
-                    //doc.permit_times.forEach(item => console.log(item))
                     const permit_times = Object.values(doc.data().permit_times)
                     let geoPoints = [];
                     doc.data().boundary.map(coor => {
@@ -26,7 +25,7 @@ export const PermitProvider = ({children}) => {
                             longitude: coor.longitude,
                         })
                     })
-                    permsD.push({boundary: geoPoints, start: doc.data().start_time, end: doc.data().end_time, permit_times: permit_times})
+                    permsD.push({boundary: geoPoints, start: doc.data().start_time, end: doc.data().end_time, permit_times: permit_times, name:doc.data().name})
                 })
             })
         } catch {

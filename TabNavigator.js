@@ -10,6 +10,7 @@ import Map from './screens/Map';
 import Chatbot from './screens/Chatbot';
 import PermitList from './screens/PermitList';
 import TravelUpdate from './screens/TravelUpdate';
+import ListStackNavigator from './screens/PermitList/navigation/ListStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -57,7 +58,7 @@ const TabNavigator = () => {
             />
             <Tab.Screen 
                 name="PermitList" 
-                component={PermitList} 
+                component={ListStackNavigator} 
                 options={{
                     tabBarIcon: ({focused}) => (
                         <View style={{alignItems:'center', justifyContent:'center', width: 100,}}>

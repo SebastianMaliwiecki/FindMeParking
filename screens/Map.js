@@ -13,13 +13,16 @@ import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { Octicons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import { fetchReverseGeocoding } from '../api/GoogleMaps';
+
 
 const Map = ({navigation}) => {
 
     const latitudeDelta = 0.0922;
     const longitudeDelta = 0.0421;
 
-    const currentDay = new Date().getDay();
+    let currentDay = new Date().getDay();
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
     const { permitData } = usePermitContext();
@@ -41,12 +44,17 @@ const Map = ({navigation}) => {
     const mapRef = useRef()
     const polyRef = useRef()
     const [permitMessage, setPermitMessage] = useState("");
+    const [currentLocation, setCurrentLocation] = useState() 
 
     const sheetRef = useRef();
     const fall = new Animated.Value(1);
     
-    const fetchPermitData = () => {
+    const fetchPermitData = async () => {
         try {
+            const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${currentUserLocation.latitude}, ${currentUserLocation.longitude}&key=AIzaSyCem1zT06KxaFp1ORi5NjG6_cYF1OxfPeo`)
+            const data = await res.json()
+            setCurrentLocation(data.results)
+
             if(inPermitZone) {
                 if(geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
                     setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
@@ -75,9 +83,25 @@ const Map = ({navigation}) => {
         }
     }
 
-    useEffect(() => {
+    const fetchReverseGeocoding = async (lat, long) => {
+        try {
+            const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=AIzaSyCem1zT06KxaFp1ORi5NjG6_cYF1OxfPeo`)
+            const data = await res.json()
+            return data
+        }
+        catch {
+            console.log("Error with API call.")
+        }
+    }
+
+    
+
+    useEffect(async () => {
         fetchPermitData()
-        console.log(new Date().getDay(), "dfgedr")
+        // const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=51.53455214235189, 0.1357554733307456&key=AIzaSyCem1zT06KxaFp1ORi5NjG6_cYF1OxfPeo`)
+        // const data = await res.json()
+        // setCurrentLocation(data.results)
+        // console.log(data.results[5].formatted_address, "fs")
     }, [])
 
     useEffect(() => {
@@ -103,8 +127,12 @@ const Map = ({navigation}) => {
         })();
     }, []);
 
-    useEffect(() => {
+    useEffect(async () => {
         animateToRegion();
+        // const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${region.latitude}, ${region.longitude}&key=AIzaSyCem1zT06KxaFp1ORi5NjG6_cYF1OxfPeo`)
+        // const data = await res.json()
+        // setCurrentLocation(data.results)
+        // console.log(data.results[4].formatted_address)
     }, [region])
 
     const animateToRegion = () => {
@@ -170,6 +198,7 @@ const Map = ({navigation}) => {
     const permitZoneColour = (start, end) => {
         const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
         const now = timeToDecimal(currentTimeStringFormat)
+        
         //console.log(timeToDecimal("17:26"))
         if (currentDecimalTime >= start && currentDecimalTime < end) {
             return "rgba(238, 22, 22, 0.12)" // red - cannot paork
@@ -179,37 +208,50 @@ const Map = ({navigation}) => {
         }
         return "rgba(39, 245, 50, 0.14)" // green - can park
     }
+
+    //console.log(timeToDecimal("20:43"))
     
     const checkIfPermitZonesApplies = (start, end) => {
-        const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
-        const now = timeToDecimal(currentTimeStringFormat)
-        if (now >= start && now < end) {
-            return true
-        } 
-        return false
+        try {
+            const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
+            const now = timeToDecimal(currentTimeStringFormat)
+            if (now >= start && now < end) {
+                return true
+            } 
+            else if (start==0 && end ==0) {
+                return false
+            }
+            return false
+        }
+        catch {
+            return null
+        }
     }
 
-    const displayPermitMessage = (start, end) => {
+    const displayPermitMessage = () => {
         const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
         const now = timeToDecimal(currentTimeStringFormat)
+        
         try {
+            const start = currentPermitZone.permit_times[currentDay][0]
+            const end = currentPermitZone.permit_times[currentDay][1]
+            //console.log(start)
             if(start==0 && end==0) {
-                `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} Monday`
+                return `Free parking till ${decimalToHourMinsConverter(start)} Monday`
             }
     
             if (now >= start && now < end) {
-                return `Free to park after ${decimalToHourMinsConverter(currentPermitZone.end)}`
+                return `Free to park after ${decimalToHourMinsConverter(end)}pm`
             } 
             else {
-               return `Free parking till ${decimalToHourMinsConverter(currentPermitZone.start)} ${currentPermitZone.permit_times[currentDay+1][0]==0?"Monday": days[currentDay]}` 
+               return `Free parking till ${decimalToHourMinsConverter(start)}am ${currentPermitZone.permit_times[currentDay+1][0]==0 && now>= currentPermitZone.permit_times[currentDay][1]?"Monday": ""}` 
             }
+            
         }
         catch {
             return "Fetching data..."
         }
     }
-
-    const checkTimeOfDay = () => new Date().getHours < 12 ? true : false
 
     const permitTimesD = () => {
         try {
@@ -232,6 +274,50 @@ const Map = ({navigation}) => {
             )
         }
     }
+    
+    const displayIcon = () => {
+        try {
+            return (
+                checkIfPermitZonesApplies(currentPermitZone.permit_times[currentDay][0], currentPermitZone.permit_times[currentDay][1]) ?
+                (
+                    <View style={{backgroundColor: 'red', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                        <Octicons name="stop" size={33} color="white" />
+                    </View>
+                ) 
+                    :
+                (
+                    <View style={{backgroundColor: 'green', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                        <Entypo name="check" size={33} color="white" />
+                    </View>
+                )
+            )
+        }
+        catch {
+            return (
+                <View style={{backgroundColor: 'gray', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                    <AntDesign name="loading1" size={33} color="white" />
+                </View>
+            )
+        }
+    }
+
+    const DisplayPermitMessage = (start, end) => {
+        try {
+            return displayPermitMessage(start, end)
+        }
+        catch {
+            return  "Fetching data..."
+        }
+    }
+
+    const displayLocation = () => {
+        try {
+            return `${currentLocation[4].formatted_address} ${"\n"}${currentLocation[8].formatted_address}` //8
+        }
+        catch {
+            return "Fetching oprox. location"
+        }
+    }
 
     const renderContent = () => (
         <View
@@ -242,23 +328,9 @@ const Map = ({navigation}) => {
             }}
         >
             <View style={{flexDirection:'row'}}>
-                {
-                    checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ?
-                        (
-                            <View style={{backgroundColor: 'red', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
-                                <Octicons name="stop" size={33} color="white" />
-                            </View>
-                        ) 
-                            :
-                        (
-                            <View style={{backgroundColor: 'green', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
-                                <Entypo name="check" size={33} color="white" />
-                            </View>
-                        )
-                }
-                
+                { displayIcon() }
                 <Text style={{color: 'white', fontSize: 23, marginLeft: 20, fontWeight: 'bold'}}>
-                    {checkIfPermitZonesApplies(currentPermitZone.start, currentPermitZone.end) ? "No Parking" : "Free Parking"}
+                    {checkIfPermitZonesApplies() ? "No Parking" : "Free Parking"}
                     {"\n"}
                     <Text style={{fontSize: 15, color: '#B6B6B6', fontWeight: 'normal'}}>
                         Residential bays
@@ -269,24 +341,28 @@ const Map = ({navigation}) => {
             <View style={{alignItems: 'center', marginTop: 5, marginBottom: 5}}> 
                 <View style={{backgroundColor: '#90EE90', alignItems: 'center', borderRadius: 5}}>
                     <Text style={{color: 'black', fontSize: 17, fontWeight: 'bold', padding: 7}}>
-                        {currentPermitZone!={}? displayPermitMessage(currentPermitZone.start, currentPermitZone.end) : "Free parking all time"}
+                        {currentPermitZone!={}? displayPermitMessage() : "Free parking all time"}
                     </Text>
                 </View>
             </View>
             <ScrollView
                 showsVerticalScrollIndicator={false}
             >
-                <View
-                    style={{
-                        backgroundColor: 'rgb(13,17,23)',
-                        marginTop: 10,
-                        marginBottom: 10,
-                        height: 7,
-                        borderRadius: 5,
-                    }}
-                />
+                <View style={styles.divider}/>
+
                 <View>
-                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17, marginBottom:5}}>
+                        Current Location 
+                    </Text>
+                    <Text style={{color: 'white'}}>
+                        {displayLocation()}
+                    </Text>
+                </View>
+
+                <View style={styles.divider}/>
+
+                <View>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17, marginBottom:5}}>
                         Operating times
                     </Text>
                     <ScrollView 
@@ -299,15 +375,7 @@ const Map = ({navigation}) => {
                     </ScrollView>
                     
                 </View>
-                <View
-                    style={{
-                        backgroundColor: 'rgb(13,17,23)',
-                        marginTop: 10,
-                        marginBottom: 10,
-                        height: 7,
-                        borderRadius: 5,
-                    }}
-                />
+                <View style={styles.divider}/>
                 <View>
                     <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
                         Buy Permit
@@ -316,15 +384,7 @@ const Map = ({navigation}) => {
                         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem distinctio perspiciatis ad nostrum perferendis rerum cumque eum esse nesciunt tempora sapiente, mollitia inventore, voluptatum quod modi ipsa earum ab quaerat?
                     </Text>
                 </View>
-                <View
-                    style={{
-                        backgroundColor: 'rgb(13,17,23)',
-                        marginTop: 10,
-                        marginBottom: 10,
-                        height: 7,
-                        borderRadius: 5,
-                    }}
-                />
+                <View style={styles.divider}/>
                 <View>
                     <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
                         Data problems?
@@ -432,6 +492,7 @@ const Map = ({navigation}) => {
                 showsPointsOfInteres={true}
                 minZoomLevel={14}
                 maxZoomLevel={15.3}
+                rotateEnabled={false}
                 //onPress={ (event) => console.log(event.nativeEvent) }
                 onUserLocationChange={ region => setCurrentUserLocation(region.nativeEvent.coordinate)}
             >
@@ -538,4 +599,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginBottom: 10,
     },
+    divider: {
+        backgroundColor: 'rgb(13,17,23)',
+        marginTop: 10,
+        marginBottom: 10,
+        height: 7,
+        borderRadius: 5,
+    }
 })

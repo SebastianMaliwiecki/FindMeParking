@@ -1,10 +1,16 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { StyleSheet, Text, View, SafeAreaView, FlatList, TouchableOpacity } from 'react-native'
+import { checkIfPermitZonesApplies, timeToDecimal } from '../components/PermitHelper';
 import { usePermitContext } from '../context/PermitContext';
+import { Octicons } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
+import IndividualPermit from './PermitList/components/IndividualPermit';
 
-const PermitList = () => {
+const PermitList = ({navigation}) => {
 
     const { permitData } = usePermitContext();
+    
+    console.log(new Date().getMinutes())
 
     // Calcuate the closes zones to users location
     // Than sort them
@@ -21,18 +27,7 @@ const PermitList = () => {
             <FlatList
                 keyExtractor={(item) => item.id}
                 data={permitData}
-                renderItem={({item}) => (
-                    <View style={{
-                        borderWidth: 1,
-                        borderColor: 'white',
-                        margin: 10,
-                        borderRadius: 10,
-                    }}>
-                        <TouchableOpacity>
-                            <Text style={{color:'white', padding: 10}}>Test</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+                renderItem={({item}) => <IndividualPermit navigation={navigation} item={item}/>}
             />
         </SafeAreaView>
     )
