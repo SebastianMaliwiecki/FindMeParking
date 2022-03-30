@@ -3,6 +3,8 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PermitList from '../../PermitList';
 import PermitZone from '../components/PermitZone';
+import ZoneDirection from '../components/ZoneDirection';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +37,13 @@ const ListStackNavigator = () => {
                 component={PermitZone} 
                 options={{
 
+                }}
+            />
+            <Stack.Screen 
+                name="Permit Direction" 
+                component={ZoneDirection} 
+                options={{
+                    headerShown: false,
                 }}
             />
         </Stack.Navigator>

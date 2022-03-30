@@ -17,6 +17,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { fetchReverseGeocoding } from '../api/GoogleMaps';
 
 
+
 const Map = ({navigation}) => {
 
     const latitudeDelta = 0.0922;
@@ -235,9 +236,10 @@ const Map = ({navigation}) => {
         try {
             const start = currentPermitZone.permit_times[currentDay][0]
             const end = currentPermitZone.permit_times[currentDay][1]
+            const monday = currentPermitZone.permit_times[1][0]
             //console.log(start)
             if(start==0 && end==0) {
-                return `Free parking till ${decimalToHourMinsConverter(start)} Monday`
+                return `Free parking till ${decimalToHourMinsConverter(monday)} Monday`
             }
     
             if (now >= start && now < end) {
@@ -510,6 +512,7 @@ const Map = ({navigation}) => {
                         )
                     })
                 }
+                
             </MapView>
 
             {/* <Snackbar

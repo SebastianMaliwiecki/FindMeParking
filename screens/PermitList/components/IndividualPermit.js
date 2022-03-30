@@ -12,7 +12,7 @@ const IndividualPermit = ({navigation, item}) => {
     const date = new Date()
 
     const addExtraDay = () => {
-        if(item.permit_times[date.getDay()][1]>=now) {
+        if(item.permit_times[date.getDay()][1]<=now) {
             return date.getDate()+1
         }
         return date.getDate()
@@ -34,6 +34,7 @@ const IndividualPermit = ({navigation, item}) => {
             }
         }
         else {
+            //console.log("Ive entered")
             const time = (item.permit_times[date.getDay()][0]).toString()
             if(time.includes(".")) {
                 let stringTime = time.split('.')
@@ -85,7 +86,7 @@ const IndividualPermit = ({navigation, item}) => {
             borderRadius: 10,
         }}>
             <TouchableOpacity
-                onPress={() => navigation.navigate("Permit zone", {zone: item, timer: permitTimer})}
+                onPress={() => navigation.navigate("Permit zone", {navigation: navigation, zone: item})}
             >
                 <Text style ={{
                     color:'#B6B6B6',

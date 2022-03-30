@@ -6,7 +6,7 @@ import * as geolib from 'geolib';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { decimalToHourMinsConverter } from '../../../components/PermitHelper';
 
-const PermitZone = ({route}) => {
+const PermitZone = ({navigation, route}) => {
 
     const latitudeDelta = 0.0922;
     const longitudeDelta = 0.0421;
@@ -60,6 +60,8 @@ const PermitZone = ({route}) => {
     const animateToRegion = () => {
         mapRef.current.animateToRegion(centerOfZone, 1);
     }
+    
+    const [currentUserLocation, setCurrentUserLocation] = useState()
 
     return (
         <View style={styles.container}>
@@ -84,7 +86,7 @@ const PermitZone = ({route}) => {
                 scrollEnabled={false}
                 zoomEnabled={false}
                 //onPress={ (event) => console.log(event.nativeEvent) }
-                //onUserLocationChange={ region => setCurrentUserLocation(region.nativeEvent.coordinate)}
+                onUserLocationChange={ region => setCurrentUserLocation(region.nativeEvent.coordinate)}
             >
                 <Polygon
                     //"rgba(238, 22, 22, 0.12)"
@@ -122,7 +124,7 @@ const PermitZone = ({route}) => {
                 </ScrollView>
 
                 <View style={{alignSelf:'center'}}>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate("Permit Direction", {navigation:navigation, coord: centerOfZone, userLocation: currentUserLocation})}}>
                         <Text style={styles.buttonText}><FontAwesome5 name="directions" size={30} color="white" /></Text>
                     </TouchableOpacity>
                 </View>
