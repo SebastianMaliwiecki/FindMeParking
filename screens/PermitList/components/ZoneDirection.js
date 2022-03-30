@@ -18,7 +18,7 @@ const ZoneDirection = ({navigation, route}) => {
     const sheetRef = useRef();
     const fall = new Animated.Value(1);
     
-    const origin = {latitude: 51.535232538269454, longitude: 0.13572297277591183};
+    const origin = {latitude: userLocation.latitude, longitude: userLocation.longitude};
     const destination = {latitude: coord.latitude, longitude: coord.longitude};
     const GOOGLE_MAPS_APIKEY = 'AIzaSyCem1zT06KxaFp1ORi5NjG6_cYF1OxfPeo';
 
@@ -37,12 +37,11 @@ const ZoneDirection = ({navigation, route}) => {
         var rhours = Math.floor(hours);
         var minutes = (hours - rhours) * 60;
         var rminutes = Math.round(minutes);
-        return num + " minutes = " + rhours + " hour(s) and " + rminutes + " minute(s).";
+        return rhours + " hour(s) and " + rminutes + " minute(s).";
     }
 
     return (
         <View>
-            
             <BottomSheet
                 ref={sheetRef}
                 snapPoints={[300, 165]}
@@ -75,14 +74,14 @@ const ZoneDirection = ({navigation, route}) => {
                             Distance
                         </Text>
                         <Text style={{fontSize: 15, color: '#B6B6B6', fontWeight: 'normal'}}>
-                            {travelInformation.distance} km
+                            {travelInformation ? `${travelInformation.distance} km` : "Calculating distance"}
                         </Text>
                         <View style={styles.divider}/>
                         <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17, marginBottom:5}}>
                             Duration
                         </Text>
                         <Text style={{fontSize: 15, color: '#B6B6B6', fontWeight: 'normal'}}>
-                            {timeCoverter(travelInformation.duration)}
+                        {travelInformation ? `${timeCoverter(travelInformation.duration)} ` : "Calculating travel duration"}
                         </Text>
                     </View>
                 )}

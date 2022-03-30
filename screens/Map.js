@@ -16,8 +16,6 @@ import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { fetchReverseGeocoding } from '../api/GoogleMaps';
 
-
-
 const Map = ({navigation}) => {
 
     const latitudeDelta = 0.0922;
