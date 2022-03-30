@@ -47,6 +47,9 @@ const Map = ({navigation}) => {
 
     const sheetRef = useRef();
     const fall = new Animated.Value(1);
+
+    const [inPermitZone, setInPertmitZone] = useState(false)
+    const [currentPermitZone, setCurreontPermitZone] = useState({})
     
     const fetchPermitData = async () => {
         try {
@@ -55,10 +58,8 @@ const Map = ({navigation}) => {
             setCurrentLocation(data.results)
 
             if(inPermitZone) {
-                if(geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
-                    setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
-                }
-                else {
+                if(!geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
+                    //setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
                     setInPertmitZone(false)
                 }
             }
@@ -73,6 +74,7 @@ const Map = ({navigation}) => {
                     }
                     else {
                         setPermitMessage("Not in any zone")
+                        setInPertmitZone(false)
                     }
                 })
             }
@@ -166,9 +168,6 @@ const Map = ({navigation}) => {
     //     });
     // }, [])
 
-    const [inPermitZone, setInPertmitZone] = useState(false)
-    const [currentPermitZone, setCurreontPermitZone] = useState({})
-
     /*
         - a way to check what the time is and set a message based on the time, if the user is in zone during permit time display proper message and
         vice versa.
@@ -249,6 +248,9 @@ const Map = ({navigation}) => {
             
         }
         catch {
+            if(!inPermitZone) {
+                return "No zone detected, check street signs"
+            }
             return "Fetching data..."
         }
     }
@@ -293,6 +295,14 @@ const Map = ({navigation}) => {
             )
         }
         catch {
+            if(!inPermitZone) {
+                return (
+                    <View style={{backgroundColor: 'gray', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                        <AntDesign name="questioncircle" size={33} color="white" />
+                    </View>
+                    
+                )
+            }
             return (
                 <View style={{backgroundColor: 'gray', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
                     <AntDesign name="loading1" size={33} color="white" />
@@ -370,7 +380,7 @@ const Map = ({navigation}) => {
                         showsHorizontalScrollIndicator={false}
                     >
                         {
-                            permitTimesD()
+                            inPermitZone ? permitTimesD() : (<Text style={{color:'white',}}>Permit times unavailable</Text>)
                         }
                     </ScrollView>
                     
@@ -380,9 +390,20 @@ const Map = ({navigation}) => {
                     <Text style={{color: 'white', fontWeight: 'bold', fontSize: 17}}>
                         Buy Permit
                     </Text>
-                    <Text>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem distinctio perspiciatis ad nostrum perferendis rerum cumque eum esse nesciunt tempora sapiente, mollitia inventore, voluptatum quod modi ipsa earum ab quaerat?
-                    </Text>
+                    {
+                        inPermitZone ?
+                        (
+                            <Text>
+                                show link
+                            </Text>
+                        ) 
+                        :
+                        (
+                            <Text style={{color:'white'}}>
+                                No permit charge present
+                            </Text>
+                        )
+                    }
                 </View>
                 <View style={styles.divider}/>
                 <View>
