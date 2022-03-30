@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import StackNavigator from './StackNavigator';
 import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons'; 
+import { FontAwesome5 } from '@expo/vector-icons';
 
 import Map from './screens/Map';
 import Chatbot from './screens/Chatbot';
@@ -90,12 +91,8 @@ const TabNavigator = () => {
                 options={{
                     tabBarIcon: ({focused}) => (
                         <View style={{alignItems:'center', justifyContent:'center', width: 100,}}>
-                            <Entypo 
-                                name="chat" 
-                                size={20} 
-                                color={focused ? tabColour.focused : tabColour.notNofuced} 
-                            />
-                            <Text style={{color: focused ? tabColour.focused : tabColour.notNofuced, fontSize: 11}}>Chatbot</Text>
+                            <FontAwesome5 name="car-side" size={20} color={focused ? tabColour.focused : tabColour.notNofuced} />
+                            <Text style={{color: focused ? tabColour.focused : tabColour.notNofuced, fontSize: 11}}>Car compliance</Text>
                         </View>
                     )
                 }}

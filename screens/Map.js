@@ -483,17 +483,6 @@ const Map = ({navigation}) => {
                     <Ionicons name="settings" size={27} color="white" />
                 </View>
             </TouchableOpacity>
-
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate("Car-Info")
-                }}
-                style={styles.car}
-            >
-                <View>
-                    <FontAwesome5 name="car-side" size={24} color="white" />
-                </View>
-            </TouchableOpacity>
             
             <MapView
                 ref={mapRef}
