@@ -72,10 +72,6 @@ const Map = ({navigation}) => {
                         setCurreontPermitZone(item)
                         setInPertmitZone(true)
                     }
-                    else {
-                        setPermitMessage("Not in any zone")
-                        setInPertmitZone(false)
-                    }
                 })
             }
         }
@@ -380,7 +376,7 @@ const Map = ({navigation}) => {
                         showsHorizontalScrollIndicator={false}
                     >
                         {
-                            inPermitZone ? permitTimesD() : (<Text style={{color:'white',}}>Permit times unavailable</Text>)
+                            permitTimesD()
                         }
                     </ScrollView>
                     
