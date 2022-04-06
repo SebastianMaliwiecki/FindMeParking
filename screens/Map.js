@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
-import MapView, {Polygon, PROVIDER_GOOGLE} from 'react-native-maps'
+import MapView, {Polygon, Polyline, PROVIDER_GOOGLE} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import mapStyle from '../assets/map/MapStyle';
@@ -25,6 +25,7 @@ const Map = ({navigation}) => {
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
     const { permitData } = usePermitContext();
+    //console.log(ulezData)
     
     // Set intial region location
     const [region, setRegion] = useState({
@@ -135,6 +136,21 @@ const Map = ({navigation}) => {
     const animateToRegion = () => {
         mapRef.current.animateToRegion(region, 1000);
     }
+
+    let ulezPoints = [];
+    
+    useEffect( async () => {
+        const docRef = doc(db, "London_zones", "ULEZ");
+        const docSnap = await getDoc(docRef);
+        
+        docSnap.data().boundary.map(coor => {
+            ulezPoints.push({
+                latitude: coor.latitude,
+                longitude: coor.longitude,
+            })
+        })
+        console.log(ulezPoints)
+    }, [])
     
     const permitBoundary =  {
     }
@@ -159,7 +175,7 @@ const Map = ({navigation}) => {
     //         })
     //     }
     //     console.log(bounds)
-    //     return await setDoc(doc(db, "Permit_zones", "zone-c"), {
+    //     return await setDoc(doc(db, "London_zones", "ULEZ"), {
     //         boundary: bounds
     //     });
     // }, [])
@@ -205,10 +221,12 @@ const Map = ({navigation}) => {
 
     //console.log(timeToDecimal("20:43"))
     
-    const checkIfPermitZonesApplies = (start, end) => {
+    const checkIfPermitZonesApplies = () => {
         try {
             const currentTimeStringFormat = `${new Date().getHours()}:${new Date().getMinutes()}`
             const now = timeToDecimal(currentTimeStringFormat)
+            const start = currentPermitZone.permit_times[currentDay][0]
+            const end = currentPermitZone.permit_times[currentDay][1]
             if (now >= start && now < end) {
                 return true
             } 
@@ -516,6 +534,11 @@ const Map = ({navigation}) => {
                         )
                     })
                 }
+                <Polyline
+                    coordinates={ulezPoints}
+                    strokeWidth={2}
+                    strokeColor={'red'}
+                />
                 
             </MapView>
 

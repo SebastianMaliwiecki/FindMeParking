@@ -1,8 +1,11 @@
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, Image, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, Image, SafeAreaView, TouchableOpacity, ScrollView, } from 'react-native'
 import { useUserContext } from '../context/UserContext'
 import { AntDesign } from '@expo/vector-icons'
+import { FontAwesome5 } from '@expo/vector-icons'
+import * as WebBrowser from 'expo-web-browser'
+import { Octicons } from '@expo/vector-icons'
 
 const Chatbot = () => {
 
@@ -42,19 +45,34 @@ const Chatbot = () => {
                     </Text>
                 </Text>
             </View>
-            <View style={{flexDirection:'row'}}>
-                <View style={styles.blueBox}/>
-                <View style={styles.numerplate}>
-                    <Text style={styles.nunberPlateText}>
-                        {info.car_registration}
-                    </Text>
+            <ScrollView showsHorizontalScrollIndicator={false}>
+                
+                <Text style={styles.carTitle}>
+                    Your car:
+                </Text>
+                
+                <View style={{alignItems:'center'}}>
+                    <View style={{flexDirection:'row'}}>
+                        <View style={styles.blueBox}/>
+                        <View style={styles.numerplate}>
+                            <Text style={styles.nunberPlateText}>
+                                {info.car_registration}
+                            </Text>
+                        </View>
+                    </View>
                 </View>
-            </View>
-            {
-                ulezData ?
-                (
-                    <View style={styles.detailsContainer}>
-                        <Text style={styles.carDetails}>{ulezData.colour} <Text style={{fontWeight:'bold'}}>{ulezData.make} {ulezData.model}</Text></Text>
+
+                {
+                    ulezData ?
+                    (
+                        <View style={styles.detailsContainer}>
+                            <View style={{alignItems: 'center', paddingTop: 10}}>
+                                <FontAwesome5 name="car-side" size={50} color={'white'} />
+                            </View>
+                            <Text style={styles.carDetails}><Text style={{color:'#B6B6B6',}}>{ulezData.colour}</Text> <Text style={{fontWeight:'bold'}}>{ulezData.make} {ulezData.model}</Text></Text>
+                            <View style={styles.dividerWrapper}>
+                                <View style={styles.divider}/>
+                            </View>
                             {/* <View style={{alignItems: 'center'}}>
                                 <Image
                                     source={{uri:ulezImage}}
@@ -68,9 +86,20 @@ const Chatbot = () => {
                                     }}
                                 />
                             </View> */}
-                            <View style={{flexDirection:'row', padding: 5, backgroundColor: 'rgb(13,17,23)', margin: 5, borderRadius: 15}}>
-                                <View style={{backgroundColor: 'rgb(94,151,50)', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
-                                    <AntDesign name="checkcircle" size={32} color="white" />
+                            <Text style={styles.chargeHeader}>
+                                {ulezData.compliance=="Compliant" ? 'One charge applies to your vehicle:' : 'Two charges apply to your vehicle:'}
+                            </Text>
+                            <View style={{alignItems: 'center'}}>
+                                <Text style={{fontSize: 15, color:'#B6B6B6', padding: 7}}>ULEZ {'&'} LEZ</Text>
+                            </View>
+                            <View style={styles.charge}>
+                                <View style={{backgroundColor: ulezData.compliance=="Compliant" ? 'rgb(94,151,50)' : 'red', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                                    {
+                                        ulezData.compliance=="Compliant" ?
+                                        <AntDesign name="checkcircle" size={32} color="white" />
+                                        :
+                                        <Octicons name="stop" size={32} color="white" />
+                                    }
                                 </View>
                                 <Text style={{color: 'white', fontSize: 17,  fontWeight: 'bold', flex: 1, flexWrap: 'wrap', paddingLeft: 7}}>
                                     {
@@ -81,15 +110,37 @@ const Chatbot = () => {
                                     }
                                 </Text>
                             </View>
-                    </View>
-                )
-                :
-                (
-                    <Text>
-                        
-                    </Text>
-                )
-            }
+                            <View style={{alignItems: 'center'}}>
+                                <Text style={{fontSize: 15, color:'#B6B6B6', padding: 7}}>Congestion Charge</Text>
+                            </View>
+                            <View style={styles.charge}>
+                                <View style={{backgroundColor: 'red', justifyContent: 'center', alignItems: 'center', borderRadius:7, width: 50, height: 50 }}>
+                                    <Octicons name="stop" size={32} color="white" />
+                                </View>
+                                <Text style={{color: 'white', fontSize: 17,  fontWeight: 'bold', flex: 1, flexWrap: 'wrap', paddingLeft: 7}}>
+                                    Your vehicle requires to pay congestion charge fee inorder to enter the zone.
+                                </Text>
+                            </View>
+                            <View style={{alignItems: 'center'}}>
+                                <TouchableOpacity 
+                                    style={styles.button}
+                                    onPress={async () => {
+                                        await WebBrowser.openBrowserAsync('https://tfl.gov.uk/modes/driving/check-your-vehicle/')
+                                    }}
+                                >
+                                    <Text style={styles.buttonText}>Check out TFL website for more info regarding payments</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )
+                    :
+                    (
+                        <Text>
+                            
+                        </Text>
+                    )
+                }
+            </ScrollView>
         </SafeAreaView>
     )
 }
@@ -101,6 +152,25 @@ const styles = StyleSheet.create({
         flex: 1,
         //justifyContent: 'center',
         backgroundColor: 'rgb(7,10,14)'
+    },
+    button: {
+        marginTop: 10,
+        alignItems: "center",
+        backgroundColor: 'rgb(13,17,23)',
+        padding: 10,
+        overflow: 'hidden',
+        borderRadius: 7,
+        width: '90%',
+    },
+    buttonText: {
+        textAlign: 'center',
+        color:'#B6B6B6'
+    },
+    carTitle: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: '700',
+        padding: 10
     },
     blueBox: {
         height: 'auto', 
@@ -143,4 +213,28 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         marginLeft: 20,
     }, 
+    dividerWrapper: {
+        alignItems: 'center',
+    },  
+    divider: {
+        backgroundColor: 'rgb(13,17,23)',
+        marginTop: 10,
+        marginBottom: 10,
+        height: 7,
+        borderRadius: 5,
+        width: '90%'
+    },
+    chargeHeader: {
+        padding: 7,
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 20
+    },
+    charge: {
+        flexDirection:'row', 
+        padding: 5, 
+        backgroundColor: 'rgb(13,17,23)', 
+        margin: 5, 
+        borderRadius: 15
+    }
 })
