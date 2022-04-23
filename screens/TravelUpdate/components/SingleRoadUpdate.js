@@ -3,20 +3,7 @@ import React, {useEffect, useState} from 'react'
 
 const SingleRoadUpdate = ({route}) => {
 
-    const {item} = route.params;
-    const [roadData, setRoadData] = useState()
-
-    useEffect(async () => {
-        try {
-            const res = await fetch(`https://api.tfl.gov.uk/Road/${item.road}/Disruption`)
-            const data = await res.json()
-            setRoadData(data)
-        }
-        catch {
-            console.log("Error when fetching traffic data")
-            return ['error']
-        }
-    }, [])
+    const {item, roadData} = route.params;
 
     return (
         <SafeAreaView style={styles.container}>

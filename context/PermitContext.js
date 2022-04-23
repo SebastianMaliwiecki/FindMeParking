@@ -25,7 +25,13 @@ export const PermitProvider = ({children}) => {
                             longitude: coor.longitude,
                         })
                     })
-                    permsD.push({boundary: geoPoints, start: doc.data().start_time, end: doc.data().end_time, permit_times: permit_times, name:doc.data().name})
+                    permsD.push({
+                        boundary: geoPoints, 
+                        start: doc.data().start_time, 
+                        end: doc.data().end_time, 
+                        permit_times: permit_times, 
+                        name:doc.data().name
+                    })
                 })
             })
         } catch {

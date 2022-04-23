@@ -59,14 +59,19 @@ const Map = ({navigation}) => {
             setCurrentLocation(data.results)
 
             if(inPermitZone) {
-                if(!geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, currentPermitZone.boundary)) {
-                    //setPermitMessage(`You cannot park here till ${decimalToHourMinsConverter(currentPermitZone.end)}`)
+                if(!geolib.isPointInPolygon({ 
+                        latitude: currentUserLocation.latitude, 
+                        longitude: currentUserLocation.longitude 
+                    }, currentPermitZone.boundary)) {
                     setInPertmitZone(false)
                 }
             }
             else {
                 permitData.map((item) => {
-                    let boundaries = geolib.isPointInPolygon({ latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude }, item.boundary)
+                    let boundaries = geolib.isPointInPolygon({ 
+                        latitude: currentUserLocation.latitude, 
+                        longitude: currentUserLocation.longitude 
+                    }, item.boundary)
                     
                     if(boundaries) {
                         setPermitMessage(`You can park here till ${item.end}`)

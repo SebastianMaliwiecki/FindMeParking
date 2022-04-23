@@ -1,5 +1,7 @@
 import React, {useEffect} from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
+import RoadUpdate from './TravelUpdate/components/RoadUpdate'
+
 
 const TravelUpdate = ({navigation}) => {
 
@@ -9,14 +11,6 @@ const TravelUpdate = ({navigation}) => {
         {id: 2,road:'a205'}, 
         {id: 3,road:'a4'}
     ]
-
-    let roadData = []
-
-    useEffect( async () => {
-        
-    }, [])
-
-    
 
     return (
         <SafeAreaView style={styles.container}>
@@ -31,18 +25,19 @@ const TravelUpdate = ({navigation}) => {
                 <View style={styles.preSetWrap}>
                     {
                         preSetRoads.map((item,index) => (
-                            <View style={styles.optionWrap} key={item.id}>
-                                <TouchableOpacity
-                                    style={{height: '100%'}}
-                                    onPress={() => navigation.navigate("Single_road_update", {item: item})}
-                                >
-                                    <Text style={styles.taskHeader}>
-                                        {item.road.toUpperCase()}
-                                    </Text>
-                                    <Text style={styles.number}>
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
+                            // <View style={styles.optionWrap} key={item.id}>
+                            //     <TouchableOpacity
+                            //         style={{height: '100%'}}
+                            //         onPress={() => navigation.navigate("Single_road_update", {item: item})}
+                            //     >
+                            //         <Text style={styles.taskHeader}>
+                            //             {item.road.toUpperCase()}
+                            //         </Text>
+                            //         <Text style={styles.number}>
+                            //         </Text>
+                            //     </TouchableOpacity>
+                            // </View>
+                            <RoadUpdate navigation={navigation} item={item}/>
                         ))
                     }
                 </View>

@@ -64,6 +64,7 @@ const Login = ({navigation}) => {
                     onChangeText={setEmail}
                     keyboardAppearance='dark'
                     keyboardType='email-address'
+                    autoCapitalize='none'
                 />
                 <TextInput
                     style={styles.input}

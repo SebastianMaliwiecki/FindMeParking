@@ -54,17 +54,21 @@ const IndividualPermit = ({navigation, item}) => {
     const [permitTimer, setPermitTimer] = useState();
 
     const displayMessage = () => {
-        
-        if((item.permit_times[date.getDay()+1][0] == 0 && now >= item.permit_times[date.getDay()+1][1]) || item.permit_times[date.getDay()][0]==0 && item.permit_times[date.getDay()][1]==0) {
-            return `Free parking till ${decimalToHourMinsConverter(item.permit_times[1][0])} Monday`
-        }
-        else {
-            return `${permitTimer} of free parking`
+        try {
+            if(now >= item.permit_times[date.getDay()][1] || (item.permit_times[date.getDay()][0]==0) ) {
+                return `Free parking till ${decimalToHourMinsConverter(item.permit_times[1][0])} Monday`
+            }
+            else {
+                return `${permitTimer} of free parking`
+            }
+        } 
+        catch {
+            return 'Fetching..'
         }
     }
 
     useEffect(() => {
-        setInterval(function() {
+        setInterval(() => {
             var now = new Date().getTime();
               
             var distance = countDownDate - now;

@@ -1,5 +1,5 @@
 import React,{ useRef, useState } from 'react'
-import { View, KeyboardAvoidingView, TextInput, StyleSheet, Text, Platform, TouchableWithoutFeedback, Button, Keyboard  } from 'react-native';
+import { View, KeyboardAvoidingView, TextInput, StyleSheet, Text, Platform, TouchableWithoutFeedback, Button, Keyboard, TouchableOpacity  } from 'react-native';
 import { useAuthContext } from '../context/AuthContext';
 
 const Signup = ({navigation}) => {
@@ -41,53 +41,62 @@ const Signup = ({navigation}) => {
             <View>
                 <Text style={styles.text}>Sign up</Text>
             </View>
-            <TextInput
-                style={styles.input}
-                placeholder='Name'
-                placeholderTextColor='rgb(186, 181, 181)'
-                onChangeText={setName} 
-                keyboardAppearance='dark'
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='Email'
-                placeholderTextColor='rgb(186, 181, 181)'
-                onChangeText={setEmail}
-                keyboardAppearance='dark'
-                keyboardType='email-address'
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='Password'
-                placeholderTextColor='rgb(186, 181, 181)'
-                onChangeText={setPassword} 
-                keyboardAppearance='dark'
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='Car Registration'
-                placeholderTextColor='rgb(186, 181, 181)'
-                onChangeText={setCarReg} 
-                keyboardAppearance='dark'
-                autoCapitalize = {"characters"}
-            />
-            <Button
-                title={buttonActive ? "Logging in..." : "Press to login"}
-                onPress={() => {
-                    Keyboard.dismiss();
-                    submisionHandler();
-                }}
-                style={styles.button}
-            />
-            <Button
-                title="Already have an account?"
-                onPress={() => {
-                    Keyboard.dismiss();
-                    navigation.navigate('Login');
-                }}
-                style={styles.button}
-            />
-            
+            <View style={styles.formContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder='Name'
+                    placeholderTextColor='rgb(186, 181, 181)'
+                    onChangeText={setName} 
+                    keyboardAppearance='dark'
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder='Email'
+                    placeholderTextColor='rgb(186, 181, 181)'
+                    onChangeText={setEmail}
+                    keyboardAppearance='dark'
+                    keyboardType='email-address'
+                    autoCapitalize='none'
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder='Password'
+                    placeholderTextColor='rgb(186, 181, 181)'
+                    onChangeText={setPassword} 
+                    keyboardAppearance='dark'
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder='Car Registration'
+                    placeholderTextColor='rgb(186, 181, 181)'
+                    onChangeText={setCarReg} 
+                    keyboardAppearance='dark'
+                    autoCapitalize = {"characters"}
+                />
+                <TouchableOpacity
+                    onPress={() => {
+                        Keyboard.dismiss();
+                        submisionHandler();
+                    }}
+                    style={styles.button}
+                >
+                    <Text style={styles.signUpText}>{buttonActive ? "Creating account..." : "Sign up"}</Text>
+                </TouchableOpacity>
+                <View style={{marginTop: 50, justifyContent: 'center', alignItems: 'center',}}>
+                    <Text style={{color: 'white', fontSize: 15}}>
+                        Already have an account?
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            Keyboard.dismiss();
+                            navigation.goBack();
+                        }}
+                        style={styles.button}
+                    >
+                        <Text style={styles.signUpText}>Login!</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         </KeyboardAvoidingView>
     )
 }
@@ -98,7 +107,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: 'rgb(7,10,14)'
     },
     input: {
@@ -118,10 +126,27 @@ const styles = StyleSheet.create({
     text: {
         color: 'white',
         fontWeight: '600',
-        fontSize: 20,
+        fontSize: 50,
+        borderRadius: 25,
+        marginBottom: 30,
+        marginLeft: 25,
     },
     button: {
-        marginTop: 30,
-    }
+        marginTop: 10,
+        alignItems: "center",
+        backgroundColor: 'rgb(13,17,23)',
+        padding: 10,
+        overflow: 'hidden',
+        borderRadius: 25,
+        width: '90%',
+    },
+    formContainer: {
+        alignItems: 'center',
+    },
+    signUpText: {
+        fontSize: 15,
+        color: 'rgb(56,166,255)',
+        margin: 0,
+    },
 });
 
