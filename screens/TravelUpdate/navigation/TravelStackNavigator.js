@@ -3,6 +3,8 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TravelUpdate from '../../TravelUpdate';
 import SingleRoadUpdate from '../components/SingleRoadUpdate';
+import SearchRoad from '../components/SearchRoad';
+
 
 
 
@@ -35,6 +37,14 @@ const TravelStackNavigator = () => {
             <Stack.Screen 
                 name="Single_road_update" 
                 component={SingleRoadUpdate} 
+                
+                options={{
+                    title: ''
+                }}
+            />
+            <Stack.Screen 
+                name="Search_road" 
+                component={SearchRoad} 
                 
                 options={{
                     title: ''

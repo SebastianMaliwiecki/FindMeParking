@@ -5,9 +5,13 @@ import { AuthProvider } from './context/AuthContext';
 import { UserProvider } from './context/UserContext';
 import NavigationManager from './NavigationManager';
 import { PermitProvider } from './context/PermitContext';
+import { LogBox } from 'react-native';
 
 
 export default function App() {
+
+  //LogBox.ignoreAllLogs();
+
   return (
     <NavigationContainer>
       <AuthProvider>

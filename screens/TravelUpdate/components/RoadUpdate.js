@@ -39,7 +39,7 @@ export default RoadUpdate
 const styles = StyleSheet.create({
     optionWrap: {
         height: 90,
-        backgroundColor: 'rgb(29,29,29)',
+        backgroundColor: 'rgb(13,17,23)',
         width: '47%',
         marginBottom: 10,
         borderRadius: 15,
